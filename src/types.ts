@@ -16,3 +16,11 @@ export type Character = {
   edited: string;
   url: string;
 };
+
+export enum HttpMethodsE {
+  GET = 'GET',
+  POST = 'POST',
+  PUT = 'PUT',
+  PATCH = 'PATCH',
+  DELETE = 'DELETE'
+}
