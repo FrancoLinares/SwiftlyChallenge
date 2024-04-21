@@ -1,5 +1,6 @@
 import Logo from '@/components/Logo';
 import ErrorBoundary from './ErrorBoundary';
+import Search from '@/components/Search';
 
 function App() {
   return (
@@ -12,6 +13,7 @@ function App() {
           <h1 className="mx-auto max-w-2xl text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">
             Didn't find Star Wars character you were looking for?
           </h1>
+          <Search />
         </div>
       </div>
     </ErrorBoundary>
