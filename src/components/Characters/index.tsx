@@ -1,9 +1,12 @@
 import useQueryCharacters from '@hooks/useQueryCharacters';
 import Card from '@ui/Card';
 import Skeleton from '@ui/Skeleton';
-import { Character } from '@/types';
+import { Character, Planet, Specie } from '@/types';
 import { useState } from 'react';
 import Pagination from '@ui/Pagination';
+import useFetch from '@hooks/useFetch';
+import { getId } from '@/utils/shared';
+import { API_PATHS } from '@/api/constants';
 
 const Characters = () => {
   const [currentPage, setCurrentPage] = useState(0);
@@ -16,6 +19,9 @@ const Characters = () => {
     isFetchingNextPage,
     hasNextPage
   } = useQueryCharacters();
+
+  const { data: planets } = useFetch<Planet>(API_PATHS.PLANETS);
+  const { data: species } = useFetch<Specie>(API_PATHS.SPECIES);
 
   const charactersPages = data?.pages || [];
   const allCharactersCount = data?.pages[0].count || 0;
@@ -40,8 +46,14 @@ const Characters = () => {
             <Card
               key={character.name}
               character={character}
-              planet={'Planet'}
-              specie={'Human'}
+              planet={
+                planets[(getId(character.homeworld, 'planets') || 1) - 1]
+                  ?.name || ' ... '
+              }
+              specie={
+                species[(getId(character.species?.[0], 'species') || 1) - 1]
+                  ?.name || ' ... '
+              }
             />
           ))}
         </div>
