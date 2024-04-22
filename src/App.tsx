@@ -1,8 +1,7 @@
 import Logo from '@/components/Logo';
 import ErrorBoundary from '@/ErrorBoundary';
-import Search from '@/components/Search';
-import Characters from '@components/Characters';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import CharactersContainer from './components/Characters';
 
 const queryClient = new QueryClient();
 
@@ -18,10 +17,7 @@ function App() {
             <h1 className="mx-auto max-w-2xl text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">
               Didn't find Star Wars character you were looking for?
             </h1>
-            <Search />
-            <div className="mt-[4vh]">
-              <Characters />
-            </div>
+            <CharactersContainer />
           </div>
         </div>
       </ErrorBoundary>
