@@ -46,6 +46,10 @@ To create the build use `yarn build`
 
 After the build, you can run `yarn preview` to preview the app in the browser
 
+## URL of the deployed project
+
+https://FrancoLinares.github.io/SwiftlyChallenge
+
 ## Usage Guide
 
 After installing and running the app, you can now use the app to search for your favorite Characters.
