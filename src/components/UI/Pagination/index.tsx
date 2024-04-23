@@ -5,10 +5,9 @@ import Pages from './Pages';
 export type PaginationProps = {
   currentPage: number;
   setCurrentPage: React.Dispatch<React.SetStateAction<number>>;
-  fetchNextPage: () => void;
+  fetchNextPage: (nextPage: number) => void;
   isFetchingNextPage: boolean;
   hasNextPage: boolean;
-  allPagesCount: number;
   allCharactersCount: number;
 };
 
@@ -18,7 +17,6 @@ const Pagination = ({
   fetchNextPage,
   isFetchingNextPage,
   hasNextPage,
-  allPagesCount,
   allCharactersCount
 }: PaginationProps) => {
   return (
@@ -49,12 +47,11 @@ const Pagination = ({
               <button
                 disabled={!hasNextPage || isFetchingNextPage}
                 className={`relative inline-flex items-center rounded-r-md px-2 py-2 text-gray-400 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-20 focus:outline-offset-0 ${
-                  !hasNextPage || (isFetchingNextPage && 'opacity-25')
+                  (!hasNextPage || isFetchingNextPage) && 'opacity-25'
                 }`}
                 onClick={() => {
-                  // The next page has not yet been populated
-                  if (allPagesCount <= currentPage + 1) {
-                    fetchNextPage();
+                  if (hasNextPage && !isFetchingNextPage) {
+                    fetchNextPage(currentPage + 2);
                   }
                   setCurrentPage(currentPage + 1);
                 }}
