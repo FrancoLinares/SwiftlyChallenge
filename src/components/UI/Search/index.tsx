@@ -41,10 +41,7 @@ const Search = ({
           }
         }}
       />
-      <button
-        type="submit"
-        className="w-full md:w-auto px-6 py-3 bg-black border-black text-white fill-white active:scale-95 duration-100 border will-change-transform overflow-hidden relative rounded-xl transition-all"
-      >
+      <div className="w-full md:w-auto px-6 py-3 bg-black border-black text-white fill-white active:scale-95 duration-100 border will-change-transform overflow-hidden relative rounded-xl transition-all">
         <div className="flex items-center transition-all opacity-1">
           <button
             className="text-sm font-semibold whitespace-nowrap truncate mx-auto"
@@ -54,7 +51,7 @@ const Search = ({
             <SearchIcon />
           </button>
         </div>
-      </button>
+      </div>
     </label>
   );
 };
