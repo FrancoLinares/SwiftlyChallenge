@@ -31,6 +31,9 @@ Due to the required implementation, a proprietary cache system was implemented t
 This exponentially increases the fluidity and efficiency of the project.
 Providers were not used to reduce latency and due to time issues.
 
+Important!: The API is being used in insecure mode (without SSL) because the Star Wars API SSL certificates expired.
+When the API will have SSL certificate again you can modify the `API_BASE_URL` by adding `https://`
+
 ## Installation Instructions
 
 Run `yarn install` to install dependencies
