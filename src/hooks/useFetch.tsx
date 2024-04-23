@@ -29,7 +29,7 @@ const useFetch = <T extends { url: string }>({
   const [pages, setPages] = useState<Page<T>[]>([]);
   const [cache, setCache] = useState<Record<string, T>>({});
   const [error, setError] = useState<{ message: string } | null>(null);
-  const isMountedRef = useRef(!isDevelopmentRun);
+  const isMountedRef = useRef(false);
 
   const makeRequests = async (
     urls: string[],
@@ -128,7 +128,7 @@ const useFetch = <T extends { url: string }>({
   useEffect(() => {
     // Check the comments on the top of the file for more info
     if (urls?.length && !isMountedRef.current) {
-      isMountedRef.current = true;
+      if (isDevelopmentRun) isMountedRef.current = true;
       makeRequests(urls, initialQueryParams);
     }
   }, [urls]);
