@@ -2,8 +2,13 @@ import { cleanup, render, screen } from '@testing-library/react';
 import Search from '..';
 import { PLACEHOLDER } from '../constants';
 
-const renderMockedApp = ({ search = '' }: { search?: string } = {}) =>
-  render(<Search search={search} setSearch={jest.fn()} />);
+const renderMockedApp = ({
+  search = '',
+  handleSearch = () => {}
+}: { search?: string; handleSearch?: () => void } = {}) =>
+  render(
+    <Search search={search} setSearch={jest.fn()} handleSearch={handleSearch} />
+  );
 
 describe('Search component', () => {
   afterEach(() => {
@@ -24,5 +29,15 @@ describe('Search component', () => {
     )) as HTMLInputElement;
 
     expect(input.value).toBe('Luke');
+  });
+
+  test('should trigger handleSearch on button click', async () => {
+    const mockHandleSearch = jest.fn();
+    renderMockedApp({ handleSearch: mockHandleSearch });
+
+    const button = await screen.getByTestId('search-button');
+    button.click();
+
+    expect(mockHandleSearch).toHaveBeenCalled();
   });
 });

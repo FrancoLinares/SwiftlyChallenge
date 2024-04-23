@@ -1,12 +1,18 @@
-import SearchIcon from '../Icons/SearchIcon';
 import { PLACEHOLDER } from './constants';
+import SearchIcon from '@icons/SearchIcon';
 
 const Search = ({
   search,
-  setSearch
+  setSearch,
+  handleSearch
 }: {
   search: string;
   setSearch: React.Dispatch<React.SetStateAction<string>>;
+  handleSearch: (
+    event:
+      | React.MouseEvent<HTMLButtonElement>
+      | React.KeyboardEvent<HTMLInputElement>
+  ) => void;
 }) => {
   const onChangeSearch = (event: React.ChangeEvent<HTMLInputElement>) => {
     event.preventDefault();
@@ -27,12 +33,28 @@ const Search = ({
         onChange={onChangeSearch}
         value={search}
         autoComplete="off"
+        onKeyPress={(event) => {
+          var key = event.keyCode || event.which;
+          if (key === 13) {
+            // "enter" button pressed
+            handleSearch(event);
+          }
+        }}
       />
-      <span className="w-full md:w-auto px-6 py-3 border-black text-white fill-white overflow-hidden relative rounded-xl">
-        <div className="flex items-center transition-all opacity-25">
-          <SearchIcon />
+      <button
+        type="submit"
+        className="w-full md:w-auto px-6 py-3 bg-black border-black text-white fill-white active:scale-95 duration-100 border will-change-transform overflow-hidden relative rounded-xl transition-all"
+      >
+        <div className="flex items-center transition-all opacity-1">
+          <button
+            className="text-sm font-semibold whitespace-nowrap truncate mx-auto"
+            onClick={handleSearch}
+            data-testid="search-button"
+          >
+            <SearchIcon />
+          </button>
         </div>
-      </span>
+      </button>
     </label>
   );
 };
