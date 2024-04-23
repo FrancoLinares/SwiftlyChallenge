@@ -1,12 +1,17 @@
 import Search from '@ui/Search';
 import Characters from '@components/Characters/CharacterList';
 import { useEffect, useMemo, useState } from 'react';
-import { getCustomUrls } from '@/utils/shared';
+import { createChunks, getCustomUrls } from '@/utils/shared';
 import useFetch from '@hooks/useFetch';
 import { Character, Page, Planet, Specie } from '@/types';
 import { API_BASE_URL, API_PATHS } from '@/api/constants';
 import Pagination from '../UI/Pagination';
-import { getPlanetsUrls, getSpeciesUrls } from './CharacterList/utils';
+import {
+  createHashMap,
+  getCharacterIdsByHashMap,
+  getPlanetsUrls,
+  getSpeciesUrls
+} from './utils';
 
 const CHARACTERS_INITIAL_PAGE = '1';
 
@@ -108,12 +113,24 @@ const CharactersContainer = () => {
 
     // Combine all urls from characters, planets, and species - get unique urls
     const uniqueUrls = [
-      ...new Set([...residentsUrls, ...speciesUrls, ...characterUrls])
+      ...new Set([...characterUrls, ...residentsUrls, ...speciesUrls])
     ];
+
+    // Convert array of urls into a hashMap
+    const characterHashMap = createHashMap(characterUrls, API_PATHS.CHARACTERS);
+    const planetHashMap = createHashMap(residentsUrls, API_PATHS.CHARACTERS);
+    const speciesHashMap = createHashMap(speciesUrls, API_PATHS.CHARACTERS);
 
     // Make the character request with the new array of ids that contains unique characters urls
     // State will be updated with the new array of characters
-    await makeCharacterRequest(uniqueUrls, {}, true);
+    const characters = await makeCharacterRequest(uniqueUrls, {}, true);
+
+    const orderedCharacters = [
+      ...getCharacterIdsByHashMap(characters, characterHashMap),
+      ...getCharacterIdsByHashMap(characters, planetHashMap),
+      ...getCharacterIdsByHashMap(characters, speciesHashMap)
+    ];
+    setCharactersPages(createChunks([...new Set(orderedCharacters)], 10));
 
     setCurrentPage(0);
   };
