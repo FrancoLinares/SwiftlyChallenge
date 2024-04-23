@@ -34,6 +34,10 @@ Providers were not used to reduce latency and due to time issues.
 Important!: The API is being used in insecure mode (without SSL) because the Star Wars API SSL certificates expired.
 When the API will have SSL certificate again you can modify the `API_BASE_URL` by adding `https://`
 
+The base url is `http://swapi.dev/api/` due this issue.
+
+If all the API requests fails due `NET::ERR_CERT_...` you can go to the `https://swapi.dev/api/people/` and type `thisisunsafe`, this is most common workaround.
+
 ## Installation Instructions
 
 Run `yarn install` to install dependencies
