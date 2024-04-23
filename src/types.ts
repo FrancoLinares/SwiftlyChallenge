@@ -1,3 +1,5 @@
+import { API_PATHS } from './api/constants';
+
 export type Character = {
   name: string;
   height: string;
@@ -66,3 +68,6 @@ export enum HttpMethodsE {
   PATCH = 'PATCH',
   DELETE = 'DELETE'
 }
+
+export type ApiKeys = keyof typeof API_PATHS;
+export type ApiPaths = (typeof API_PATHS)[ApiKeys];
