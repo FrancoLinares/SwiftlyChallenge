@@ -74,3 +74,4 @@ You can also use the search engine to find the Character, you can filter by pers
 - Add more unit tests, 80% coverage would be good
 - Lazy loading para componentes - Code Splitting
 - Add E2E test - Playwright
+- Reset filter button
