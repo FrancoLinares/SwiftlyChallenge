@@ -1,6 +1,30 @@
 import { API_PATHS } from '@/api/constants';
-import { ApiPaths, Character } from '@/types';
+import { ApiPaths, Character, Planet, Specie } from '@/types';
 import { getId } from '@/utils/shared';
+
+export const getCharacterUrlsBySearchedPlanets = (
+  planets: Planet[],
+  searchString: string
+) =>
+  planets?.reduce((acc, planet) => {
+    if (planet.name.toLowerCase().includes(searchString.toLowerCase())) {
+      acc.push(...planet.residents);
+    }
+
+    return acc;
+  }, [] as string[]) || [];
+
+export const getCharacterUrlsBySearchedSpecies = (
+  species: Specie[],
+  searchString: string
+) =>
+  species?.reduce((acc, specie) => {
+    if (specie.name.toLowerCase().includes(searchString.toLowerCase())) {
+      acc.push(...specie.people);
+    }
+
+    return acc;
+  }, [] as string[]) || [];
 
 /**
  * Filters an array of characters based on a given hash map.

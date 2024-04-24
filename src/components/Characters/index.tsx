@@ -5,7 +5,12 @@ import { createChunks, generateHashMap, getTotalLength } from '@/utils/shared';
 import { Character, HttpMethodsE, Planet, Specie } from '@/types';
 import { API_BASE_URL, API_PATHS } from '@/api/constants';
 import Pagination from '../UI/Pagination';
-import { createHashMap, getCharacterIdsByHashMap } from './utils';
+import {
+  createHashMap,
+  getCharacterIdsByHashMap,
+  getCharacterUrlsBySearchedPlanets,
+  getCharacterUrlsBySearchedSpecies
+} from './utils';
 import { useQuery } from '@tanstack/react-query';
 import { fetchData } from '@/api/fetch';
 import { PAGE_SIZE } from '@/constants';
@@ -43,7 +48,7 @@ const CharactersContainer = () => {
     [charactersPages]
   );
 
-  const { data: planets, error: planetsError } = useQuery<Planet[]>({
+  const { data: planets = [], error: planetsError } = useQuery<Planet[]>({
     queryKey: ['planets'],
     queryFn: () =>
       fetchData({
@@ -53,11 +58,11 @@ const CharactersContainer = () => {
   });
 
   const planetsHashMap = useMemo(
-    () => planets && generateHashMap(planets, API_PATHS.PLANETS),
+    () => generateHashMap(planets, API_PATHS.PLANETS),
     [planets]
   );
 
-  const { data: species, error: speciesError } = useQuery<Specie[]>({
+  const { data: species = [], error: speciesError } = useQuery<Specie[]>({
     queryKey: ['species'],
     queryFn: () =>
       fetchData({
@@ -67,7 +72,7 @@ const CharactersContainer = () => {
   });
 
   const speciesHashMap = useMemo(
-    () => species && generateHashMap(species, API_PATHS.SPECIES),
+    () => generateHashMap(species, API_PATHS.SPECIES),
     [species]
   );
 
@@ -87,14 +92,10 @@ const CharactersContainer = () => {
 
     // Filter characters by homeworld(planets)
     // Get all urls from residents field in planets
-    const residentsUrlsSearched =
-      planets?.reduce((acc, planet) => {
-        if (planet.name.toLowerCase().includes(search.toLowerCase())) {
-          acc.push(...planet.residents);
-        }
-
-        return acc;
-      }, [] as string[]) || [];
+    const residentsUrlsSearched = getCharacterUrlsBySearchedPlanets(
+      planets,
+      search
+    );
     // Create hashmap using IDs - for faster filtering
     const planetsHashMap = createHashMap(
       residentsUrlsSearched,
@@ -103,14 +104,10 @@ const CharactersContainer = () => {
 
     // Filter characters by species
     // Get all urls from people field in species
-    const speciesUrlsSearched =
-      species?.reduce((acc, specie) => {
-        if (specie.name.toLowerCase().includes(search.toLowerCase())) {
-          acc.push(...specie.people);
-        }
-
-        return acc;
-      }, [] as string[]) || [];
+    const speciesUrlsSearched = getCharacterUrlsBySearchedSpecies(
+      species,
+      search
+    );
     // Create hashmap using IDs - for faster filtering
     const speciesHashMap = createHashMap(
       speciesUrlsSearched,
