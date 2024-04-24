@@ -1,9 +1,8 @@
 import Search from '@ui/Search';
 import Characters from '@components/Characters/CharacterList';
-import { useEffect, useMemo, useState } from 'react';
-import { createChunks, generateHashMap, getTotalLength } from '@/utils/shared';
-import { Character, HttpMethodsE, Planet, Specie } from '@/types';
-import { API_BASE_URL, API_PATHS } from '@/api/constants';
+import { useState } from 'react';
+import { createChunks } from '@/utils/shared';
+import { API_PATHS } from '@/api/constants';
 import Pagination from '../UI/Pagination';
 import {
   createHashMap,
@@ -11,70 +10,25 @@ import {
   getCharacterUrlsBySearchedPlanets,
   getCharacterUrlsBySearchedSpecies
 } from './utils';
-import { useQuery } from '@tanstack/react-query';
-import { fetchData } from '@/api/fetch';
 import { PAGE_SIZE } from '@/constants';
+import { useCharacters, usePlanets, useSpecies } from '@/hooks/useStarWarsAPI';
 
 const CharactersContainer = () => {
   const [search, setSearch] = useState('');
   const [currentPage, setCurrentPage] = useState(0);
-  const [charactersPages, setCharactersPages] = useState<Character[][]>([]);
 
   const {
-    data: characters,
-    isLoading: isCharactersLoading,
-    error: charactersError
-  } = useQuery<Character[]>({
-    queryKey: ['characters'],
-    queryFn: () =>
-      fetchData({
-        url: `${API_BASE_URL}/${API_PATHS.CHARACTERS}`,
-        request: { method: HttpMethodsE.GET }
-      })
-  });
+    characters,
+    isCharactersLoading,
+    charactersError,
+    charactersPages,
+    setCharactersPages,
+    allCharactersCount
+  } = useCharacters();
 
-  const charactersChunks = useMemo(
-    () => characters && createChunks(characters, PAGE_SIZE),
-    [characters]
-  );
+  const { planets, planetsError, planetsHashMap } = usePlanets();
 
-  useEffect(
-    () => charactersChunks && setCharactersPages(charactersChunks),
-    [charactersChunks]
-  );
-
-  const allCharactersCount = useMemo(
-    () => charactersPages && getTotalLength(charactersPages),
-    [charactersPages]
-  );
-
-  const { data: planets = [], error: planetsError } = useQuery<Planet[]>({
-    queryKey: ['planets'],
-    queryFn: () =>
-      fetchData({
-        url: `${API_BASE_URL}/${API_PATHS.PLANETS}`,
-        request: { method: HttpMethodsE.GET }
-      })
-  });
-
-  const planetsHashMap = useMemo(
-    () => generateHashMap(planets, API_PATHS.PLANETS),
-    [planets]
-  );
-
-  const { data: species = [], error: speciesError } = useQuery<Specie[]>({
-    queryKey: ['species'],
-    queryFn: () =>
-      fetchData({
-        url: `${API_BASE_URL}/${API_PATHS.SPECIES}`,
-        request: { method: HttpMethodsE.GET }
-      })
-  });
-
-  const speciesHashMap = useMemo(
-    () => generateHashMap(species, API_PATHS.SPECIES),
-    [species]
-  );
+  const { species, speciesError, speciesHashMap } = useSpecies();
 
   const handleSearch = async (
     event:
