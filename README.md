@@ -19,24 +19,19 @@ Develop a webpage that presents a grid of character profile cards sourced from t
 
 ## Project Details
 
-In order to carry out this project, scalability and backend independence were the main considerations.
-Due to the fact that the search bar requirements use the search API for _each resource_ , having to force the execution of all the API resources in the search, a more custom and complex fetching system was implemented, since this forces us to make Planet and Species requests to obtain the Characters IDs.
+Scalability:
 
-The most user friendly solution with this API (which does not let you search by ID [nor has ID]) and has little information, would be to create an initial RootQuery that provides most of the Characters (using its pagination) with their Planets and Species.
-This avoids several problems and more fluidity, since all the data is in the local cache.
+- Create hooks for each resource, this way it is much simpler to implement each resource in other components.
+- Clear separation of each component, in which responsibilities are well defined.
+- Separation in files/folders for each functionality, I think it is important to separate the constants/strings because it allows to modify only once the content applied in other components. Also the content is grouped and it would be simpler to implement internationalization.
+- Separating the functions that communicate with the server helps understanding and maintainability.
+- Caching
 
-Implementations details:
+Maintainability:
 
-Due to the required implementation, a proprietary cache system was implemented to avoid unnecessary requests.
-This exponentially increases the fluidity and efficiency of the project.
-Providers were not used to reduce latency and due to time issues.
-
-Important!: The API is being used in insecure mode (without SSL) because the Star Wars API SSL certificates expired.
-When the API will have SSL certificate again you can modify the `API_BASE_URL` by adding `https://`
-
-The base url is `http://swapi.dev/api/` due this issue.
-
-If all the API requests fails due `NET::ERR_CERT_...` you can go to the `https://swapi.dev/api/people/` and type `thisisunsafe`, this is most common workaround.
+- Separating tests into folders helps organize the project, giving predictability and aiding maintainability.
+- The creation of custom hooks helps to isolate logic and state, by separating the logic from the component you can quickly understand the code and increases maintainability, as it simplifies the search and gives context to those who read the code.
+- Adding JSDocs and comments within the code helps to understand the code and increases cooperation between co-workers. I am a believer that code should be self-descriptive, but I see great value in comments for complex functions or very long blocks of code.
 
 ## Installation Instructions
 
@@ -66,14 +61,15 @@ You can also use the search engine to find the Character, you can filter by pers
 ## Interesting implementations - Aggregates
 
 - Caching
+- TanStack Query
 - Pagination
 - Error handling
 - Skeletons
 - Nice UI
+- 100% Typescript coverage
 
 ### Implementations I would have liked to perform
 
 - Add more unit tests, 80% coverage would be good
-- Lazy loading para componentes - Dividir código
+- Lazy loading para componentes - Code Splitting
 - Add E2E test - Playwright
-- Implement libraries such as ReactQuery to increase productivity and scalability
