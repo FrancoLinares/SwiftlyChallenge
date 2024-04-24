@@ -1,5 +1,7 @@
 import { PaginationProps } from '.';
 
+import { PAGE_SIZE } from '@/constants';
+
 const Pages = ({
   currentPage,
   allCharactersCount
@@ -12,13 +14,13 @@ const Pages = ({
       <p className="text-sm text-gray-700">
         Showing{' '}
         <span className="font-medium">
-          {allCharactersCount === 0 ? 0 : currentPage * 10 + 1}
+          {allCharactersCount === 0 ? 0 : currentPage * PAGE_SIZE + 1}
         </span>{' '}
         to{' '}
         <span className="font-medium">
-          {(currentPage + 1) * 10 >= allCharactersCount
+          {(currentPage + 1) * PAGE_SIZE >= allCharactersCount
             ? allCharactersCount
-            : (currentPage + 1) * 10}
+            : (currentPage + 1) * PAGE_SIZE}
         </span>{' '}
         of <span className="font-medium">{allCharactersCount}</span> results
       </p>

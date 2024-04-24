@@ -1,69 +1,75 @@
 import Search from '@ui/Search';
 import Characters from '@components/Characters/CharacterList';
 import { useEffect, useMemo, useState } from 'react';
-import { createChunks, getCustomUrls } from '@/utils/shared';
-import useFetch from '@hooks/useFetch';
-import { Character, Page, Planet, Specie } from '@/types';
+import { createChunks, generateHashMap, getTotalLength } from '@/utils/shared';
+import { Character, HttpMethodsE, Planet, Specie } from '@/types';
 import { API_BASE_URL, API_PATHS } from '@/api/constants';
 import Pagination from '../UI/Pagination';
-import {
-  createHashMap,
-  getCharacterIdsByHashMap,
-  getPlanetsUrls,
-  getSpeciesUrls
-} from './utils';
-
-const CHARACTERS_INITIAL_PAGE = '1';
+import { createHashMap, getCharacterIdsByHashMap } from './utils';
+import { useQuery } from '@tanstack/react-query';
+import { fetchData } from '@/api/fetch';
+import { PAGE_SIZE } from '@/constants';
 
 const CharactersContainer = () => {
   const [search, setSearch] = useState('');
   const [currentPage, setCurrentPage] = useState(0);
-  const [charactersPages, setCharactersPages] = useState<Page<Character>[]>([]);
+  const [charactersPages, setCharactersPages] = useState<Character[][]>([]);
 
-  const allCharactersCount = charactersPages[0]?.count || 0;
-
-  const characterUrl = useMemo(
-    () => [`${API_BASE_URL}/${API_PATHS.CHARACTERS}`],
-    []
-  );
   const {
-    data: allCharacters,
-    pages: characterPages,
-    makeRequests: makeCharacterRequest,
-    isLoading: isLoadingCharacters,
-    error
-  } = useFetch<Character>({
-    path: API_PATHS.CHARACTERS,
-    urls: characterUrl,
-    initialQueryParams: {
-      page: CHARACTERS_INITIAL_PAGE
-    },
-    returnPages: true
+    data: characters,
+    isLoading: isCharactersLoading,
+    error: charactersError
+  } = useQuery<Character[]>({
+    queryKey: ['characters'],
+    queryFn: () =>
+      fetchData({
+        url: `${API_BASE_URL}/${API_PATHS.CHARACTERS}`,
+        request: { method: HttpMethodsE.GET }
+      })
   });
 
-  useEffect(() => setCharactersPages(characterPages || []), [characterPages]);
-
-  const planetsUrls = useMemo(
-    () => getPlanetsUrls(allCharacters || []),
-    [allCharacters]
+  const charactersChunks = useMemo(
+    () => characters && createChunks(characters, PAGE_SIZE),
+    [characters]
   );
 
-  const speciesUrls = useMemo(
-    () => getSpeciesUrls(allCharacters || []),
-    [allCharacters]
+  useEffect(
+    () => charactersChunks && setCharactersPages(charactersChunks),
+    [charactersChunks]
   );
 
-  const { cache: planetHashMap, makeRequests: makePlanetsRequest } =
-    useFetch<Planet>({
-      path: API_PATHS.PLANETS,
-      urls: planetsUrls
-    });
+  const allCharactersCount = useMemo(
+    () => charactersPages && getTotalLength(charactersPages),
+    [charactersPages]
+  );
 
-  const { cache: speciesHashMap, makeRequests: makeSpeciesRequest } =
-    useFetch<Specie>({
-      path: API_PATHS.SPECIES,
-      urls: speciesUrls
-    });
+  const { data: planets, error: planetsError } = useQuery<Planet[]>({
+    queryKey: ['planets'],
+    queryFn: () =>
+      fetchData({
+        url: `${API_BASE_URL}/${API_PATHS.PLANETS}`,
+        request: { method: HttpMethodsE.GET }
+      })
+  });
+
+  const planetsHashMap = useMemo(
+    () => planets && generateHashMap(planets, API_PATHS.PLANETS),
+    [planets]
+  );
+
+  const { data: species, error: speciesError } = useQuery<Specie[]>({
+    queryKey: ['species'],
+    queryFn: () =>
+      fetchData({
+        url: `${API_BASE_URL}/${API_PATHS.SPECIES}`,
+        request: { method: HttpMethodsE.GET }
+      })
+  });
+
+  const speciesHashMap = useMemo(
+    () => species && generateHashMap(species, API_PATHS.SPECIES),
+    [species]
+  );
 
   const handleSearch = async (
     event:
@@ -72,65 +78,56 @@ const CharactersContainer = () => {
   ) => {
     event.preventDefault();
 
-    // Search for Characters
-    const searchedCharacters = await makeCharacterRequest(
-      [`${API_BASE_URL}/${API_PATHS.CHARACTERS}`],
-      {
-        search
-      }
+    if (!characters?.length || !search.trim()) return;
+
+    // Filter characters by name
+    const charactersFilteredByName = characters?.filter((character) =>
+      character.name?.toLowerCase().includes(search.toLowerCase())
     );
-    const characterUrls = getCustomUrls<Character>({
-      items: searchedCharacters,
-      objectKey: 'url',
-      pathIdentifier: API_PATHS.CHARACTERS
-    });
 
-    // Search for Planets
-    const searchedPlanets = await makePlanetsRequest(
-      [`${API_BASE_URL}/${API_PATHS.PLANETS}`],
-      {
-        search
-      }
+    // Filter characters by homeworld(planets)
+    // Get all urls from residents field in planets
+    const residentsUrlsSearched =
+      planets?.reduce((acc, planet) => {
+        if (planet.name.toLowerCase().includes(search.toLowerCase())) {
+          acc.push(...planet.residents);
+        }
+
+        return acc;
+      }, [] as string[]) || [];
+    // Create hashmap using IDs - for faster filtering
+    const planetsHashMap = createHashMap(
+      residentsUrlsSearched,
+      API_PATHS.CHARACTERS
     );
-    const residentsUrls = getCustomUrls<Planet>({
-      items: searchedPlanets,
-      objectKey: 'residents',
-      pathIdentifier: API_PATHS.CHARACTERS
-    });
 
-    // Search for Species
-    const searchedSpecies = await makeSpeciesRequest(
-      [`${API_BASE_URL}/${API_PATHS.SPECIES}`],
-      {
-        search
-      }
+    // Filter characters by species
+    // Get all urls from people field in species
+    const speciesUrlsSearched =
+      species?.reduce((acc, specie) => {
+        if (specie.name.toLowerCase().includes(search.toLowerCase())) {
+          acc.push(...specie.people);
+        }
+
+        return acc;
+      }, [] as string[]) || [];
+    // Create hashmap using IDs - for faster filtering
+    const speciesHashMap = createHashMap(
+      speciesUrlsSearched,
+      API_PATHS.CHARACTERS
     );
-    const speciesUrls = getCustomUrls<Specie>({
-      items: searchedSpecies,
-      objectKey: 'people',
-      pathIdentifier: API_PATHS.CHARACTERS
-    });
-
-    // Combine all urls from characters, planets, and species - get unique urls
-    const uniqueUrls = [
-      ...new Set([...characterUrls, ...residentsUrls, ...speciesUrls])
-    ];
-
-    // Convert array of urls into a hashMap
-    const characterHashMap = createHashMap(characterUrls, API_PATHS.CHARACTERS);
-    const planetHashMap = createHashMap(residentsUrls, API_PATHS.CHARACTERS);
-    const speciesHashMap = createHashMap(speciesUrls, API_PATHS.CHARACTERS);
-
-    // Make the character request with the new array of ids that contains unique characters urls
-    // State will be updated with the new array of characters
-    const characters = await makeCharacterRequest(uniqueUrls, {}, true);
 
     const orderedCharacters = [
-      ...getCharacterIdsByHashMap(characters, characterHashMap),
-      ...getCharacterIdsByHashMap(characters, planetHashMap),
+      ...charactersFilteredByName,
+      ...getCharacterIdsByHashMap(characters, planetsHashMap),
       ...getCharacterIdsByHashMap(characters, speciesHashMap)
     ];
-    setCharactersPages(createChunks([...new Set(orderedCharacters)], 10));
+
+    // Combine all characters, planets, and species - get unique characters
+    const uniqueOrderedCharacters = [...new Set(orderedCharacters)];
+
+    // Create pages for pagination
+    setCharactersPages(createChunks(uniqueOrderedCharacters, PAGE_SIZE));
 
     setCurrentPage(0);
   };
@@ -138,25 +135,19 @@ const CharactersContainer = () => {
   // Props for components
   const charactersProps = {
     charactersPages,
-    error: error ? new Error(error.message) : null,
-    isFetchingNextPage: false,
-    isFetching: isLoadingCharacters,
-    planetHashMap,
+    error: charactersError || planetsError || speciesError,
+    isFetchingNextPage: isCharactersLoading,
+    isFetching: isCharactersLoading,
+    planetsHashMap,
     speciesHashMap,
     currentPage
   };
   const paginationProps = {
     currentPage,
     setCurrentPage,
-    fetchNextPage: (nextPage: number) => {
-      if (charactersPages[nextPage]) return;
-      makeCharacterRequest([`${API_BASE_URL}/${API_PATHS.CHARACTERS}`], {
-        page: `${nextPage}`
-      });
-    },
-    isFetchingNextPage: isLoadingCharacters,
-    hasNextPage: (currentPage + 1) * 10 < allCharactersCount,
-    allPagesCount: charactersPages.length,
+    isFetchingNextPage: isCharactersLoading,
+    hasNextPage: (currentPage + 1) * PAGE_SIZE < allCharactersCount,
+    allPagesCount: charactersPages?.length,
     allCharactersCount
   };
 

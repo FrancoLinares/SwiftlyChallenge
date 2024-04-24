@@ -2,36 +2,20 @@ import { API_PATHS } from '@/api/constants';
 import { ApiPaths, Character } from '@/types';
 import { getId } from '@/utils/shared';
 
-export const getPlanetsUrls = (allCharacters: Character[]) => [
-  ...new Set(
-    allCharacters?.reduce((planetUrls: string[], character) => {
-      if (character.homeworld) {
-        planetUrls.push(character.homeworld);
-      }
-      return planetUrls;
-    }, [])
-  )
-];
-
-export const getSpeciesUrls = (allCharacters: Character[]) => [
-  ...new Set(
-    allCharacters?.reduce((specieUrls: string[], character) => {
-      const species = character.species?.map((specie) => specie);
-      if (species) {
-        specieUrls.push(...species);
-      }
-      return specieUrls;
-    }, [])
-  )
-];
-
+/**
+ * Filters an array of characters based on a given hash map.
+ *
+ * @param {Character[]} characters - The array of characters to filter.
+ * @param {Record<string, string>} hashMap - The hash map used for filtering.
+ * @return {Character[]} The filtered array of characters.
+ */
 export const getCharacterIdsByHashMap = (
   characters: Character[],
   hashMap: Record<string, string>
 ) =>
-  characters.filter((character) => {
-    return hashMap[`${getId(character.url, API_PATHS.CHARACTERS)}`];
-  });
+  characters.filter(
+    (character) => hashMap[`${getId(character.url, API_PATHS.CHARACTERS)}`]
+  );
 
 export const createHashMap = (items: string[], path: ApiPaths) => {
   const hashMap: Record<string, string> = {};

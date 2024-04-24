@@ -41,17 +41,13 @@ const Search = ({
           }
         }}
       />
-      <div className="w-full md:w-auto px-6 py-3 bg-black border-black text-white fill-white active:scale-95 duration-100 border will-change-transform overflow-hidden relative rounded-xl transition-all">
-        <div className="flex items-center transition-all opacity-1">
-          <button
-            className="text-sm font-semibold whitespace-nowrap truncate mx-auto"
-            onClick={handleSearch}
-            data-testid="search-button"
-          >
-            <SearchIcon />
-          </button>
-        </div>
-      </div>
+      <button
+        className="w-full md:w-auto px-6 py-3 bg-black border-black text-white fill-white active:scale-95 duration-100 border will-change-transform overflow-hidden relative rounded-xl transition-all cursor-pointer flex items-center transition-all opacity-1 text-sm font-semibold whitespace-nowrap truncate mx-auto"
+        onClick={handleSearch}
+        data-testid="search-button"
+      >
+        <SearchIcon />
+      </button>
     </label>
   );
 };

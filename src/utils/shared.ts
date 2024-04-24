@@ -1,5 +1,5 @@
-import { API_BASE_URL } from '@/api/constants';
-import { ApiPaths, Page } from '@/types';
+import { PAGE_SIZE } from '@/constants';
+import { ApiPaths } from '@/types';
 
 /**
  * Extracts the ID from a given URL string based on the specified type.
@@ -14,7 +14,7 @@ export const getId = (url: string, type: string): number | null => {
   const urlParts = url.split('/');
   const index = urlParts.findIndex((part) => part === type) + 1;
 
-  if (index > 0 && index < urlParts.length - 1) {
+  if (index > 0 && index < urlParts.length) {
     const numberString = urlParts[index];
     return parseInt(numberString);
   }
@@ -31,60 +31,48 @@ export const getId = (url: string, type: string): number | null => {
  */
 export const createChunks = <T>(
   inputArray: T[],
-  chunkSize: number | undefined = 10
+  chunkSize: number | undefined = PAGE_SIZE
 ) => {
   return inputArray.reduce((resultArray, item, index) => {
     const chunkIndex = Math.floor(index / chunkSize);
 
     if (!resultArray[chunkIndex]) {
-      resultArray[chunkIndex] = {
-        results: [],
-        count: inputArray.length,
-        next: null,
-        previous: null
-      };
+      resultArray[chunkIndex] = [];
     }
 
-    resultArray[chunkIndex].results.push(item);
+    resultArray[chunkIndex].push(item);
 
     return resultArray;
-  }, [] as Page<T>[]);
+  }, [] as T[][]);
 };
 
 /**
- * Retrieves custom URLs based on the provided items, object key, and path identifier.
+ * Generates a hash map from an array of items, where the key is the ID extracted
+ * from the item's URL using the provided path, and the value is the item itself.
  *
- * @param {Object} options - The options object.
- * @param {T[]} options.items - The array of items.
- * @param {keyof T} options.objectKey - The key of the object to retrieve URLs from.
- * @param {ApiPaths} options.pathIdentifier - The path identifier.
- * @return {string[]} The array of custom URLs.
+ * @param {T[]} items - The array of items to generate the hash map from.
+ * @param {ApiPaths} path - The path to extract the ID from the item's URL.
+ * @return {Record<string, T>} The generated hash map.
  */
-export const getCustomUrls = <T extends Record<string, any>>({
-  items,
-  objectKey,
-  pathIdentifier
-}: {
-  items: T[];
-  objectKey: keyof T;
-  pathIdentifier: ApiPaths;
-}) => {
-  return items.reduce((acc: string[], item: any) => {
-    // Add type annotations for acc and item
-    if (item[objectKey]) {
-      if (Array.isArray(item[objectKey])) {
-        const urls = item[objectKey]?.map(
-          (itemUrl: any) =>
-            `${API_BASE_URL}/${pathIdentifier}/${getId(
-              itemUrl,
-              pathIdentifier
-            )}/`
-        );
-        acc.push(...urls);
-      } else {
-        acc.push(item[objectKey]);
-      }
+export const generateHashMap = <T extends { url: string }>(
+  items: T[],
+  path: ApiPaths
+) => {
+  const hashMap: Record<string, T> = {};
+  items.forEach((obj: T) => {
+    if (getId(obj.url, path) !== null) {
+      hashMap[`${getId(obj.url, path)}`] = obj;
     }
-    return acc;
-  }, []);
+  });
+  return hashMap;
+};
+
+/**
+ * Calculates the total length of a two-dimensional array by flattening it and returning the length of the resulting one-dimensional array.
+ *
+ * @param {any[][]} arr - The two-dimensional array to calculate the total length of.
+ * @return {number} The total length of the flattened array.
+ */
+export const getTotalLength = (arr: any[][]) => {
+  return arr.flat().length;
 };

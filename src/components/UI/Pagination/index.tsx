@@ -5,7 +5,6 @@ import Pages from './Pages';
 export type PaginationProps = {
   currentPage: number;
   setCurrentPage: React.Dispatch<React.SetStateAction<number>>;
-  fetchNextPage: (nextPage: number) => void;
   isFetchingNextPage: boolean;
   hasNextPage: boolean;
   allCharactersCount: number;
@@ -14,7 +13,6 @@ export type PaginationProps = {
 const Pagination = ({
   currentPage,
   setCurrentPage,
-  fetchNextPage,
   isFetchingNextPage,
   hasNextPage,
   allCharactersCount
@@ -51,9 +49,8 @@ const Pagination = ({
                 }`}
                 onClick={() => {
                   if (hasNextPage && !isFetchingNextPage) {
-                    fetchNextPage(currentPage + 2);
+                    setCurrentPage(currentPage + 1);
                   }
-                  setCurrentPage(currentPage + 1);
                 }}
               >
                 <span className="sr-only">{NEXT}</span>
