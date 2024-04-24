@@ -8,14 +8,15 @@ For this we use the Star Wars API - https://swapi.dev/documentation#intro
 
 _Requirements:_
 Develop a webpage that presents a grid of character profile cards sourced from the Star Wars API.
-● Utilize the Star Wars API resources:
-● People: https://swapi.dev/documentation#people
-● Planets: https://swapi.dev/documentation#planets
-● Species: https://swapi.dev/documentation#species
-● Implement search functionality allowing users to search for characters by name, homeworld, or species using the search API for each resource.
-● Ensure the profile card displays the person’s name, homeworld name, and species name.
-● At the top of the profile page, include a search bar. Render a grid of profile cards that match the reflected search. If there are no results, show a message stating there are no results.
-● Support both the person’s name, homeworld name, and species as searchable criteria. Show the results for a person’s name first, then homeworld, then species.
+
+- Utilize the Star Wars API resources:
+- People: https://swapi.dev/documentation#people
+- Planets: https://swapi.dev/documentation#planets
+- Species: https://swapi.dev/documentation#species
+- Implement search functionality allowing users to search for characters by name, homeworld, or species using the search API for each resource.
+- Ensure the profile card displays the person’s name, homeworld name, and species name.
+- At the top of the profile page, include a search bar. Render a grid of profile cards that match the reflected search. If there are no results, show a message stating there are no results.
+- Support both the person’s name, homeworld name, and species as searchable criteria. Show the results for a person’s name first, then homeworld, then species.
 
 ## Project Details
 
