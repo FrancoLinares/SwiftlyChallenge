@@ -43,6 +43,10 @@ const CharactersContainer = () => {
     const charactersFilteredByName = characters?.filter((character) =>
       character.name?.toLowerCase().includes(search.toLowerCase())
     );
+    console.log(
+      '🚀 ~ CharactersContainer ~ charactersFilteredByName:',
+      charactersFilteredByName
+    );
 
     // Filter characters by homeworld(planets)
     // Get all urls from residents field in planets
@@ -73,6 +77,10 @@ const CharactersContainer = () => {
       ...getCharacterIdsByHashMap(characters, planetsHashMap),
       ...getCharacterIdsByHashMap(characters, speciesHashMap)
     ];
+    console.log(
+      '🚀 ~ CharactersContainer ~ orderedCharacters:',
+      orderedCharacters
+    );
 
     // Combine all characters, planets, and species - get unique characters
     const uniqueOrderedCharacters = [...new Set(orderedCharacters)];

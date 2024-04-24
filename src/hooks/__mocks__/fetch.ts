@@ -1,3 +1,5 @@
+import { Planet, Specie } from '@/types';
+
 export const charactersMock = [
   {
     name: 'Luke Skywalker',
@@ -112,7 +114,7 @@ export const planetsMock = [
 export const planetsMockHashMap = {
   '1': planetsMock[0],
   '2': planetsMock[1]
-};
+} as Record<string, Planet>;
 
 export const speciesMock = [
   {
@@ -177,4 +179,4 @@ export const speciesMock = [
 export const speciesMockHashMap = {
   '1': speciesMock[0],
   '2': speciesMock[1]
-};
+} as Record<string, Specie>;
